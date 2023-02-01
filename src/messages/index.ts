@@ -13,7 +13,7 @@ type ReqRes<T extends ActionName<V>, V extends OCPPVersion = OCPPVersion> =
 
 /**
  * @example
- * import { Request } from '@voltbras/ts-ocpp';
+ * import { Request } from '@qc-hlp/ts-ocpp';
  * 
  * type ChargeRelatedRequest = Request<'StartTransaction' | 'StopTransaction'>;
  * 
@@ -23,7 +23,7 @@ export type Request<T extends ActionName<V>, V extends OCPPVersion = OCPPVersion
 
 /**
  * @example
- * import { Response } from '@voltbras/ts-ocpp';
+ * import { Response } from '@qc-hlp/ts-ocpp';
  * 
  * type ChargeRelatedResponse = Response<'StartTransaction' | 'StopTransaction'>;
  * 

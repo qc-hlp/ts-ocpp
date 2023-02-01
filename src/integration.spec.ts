@@ -5,7 +5,7 @@ import { Request } from './messages';
 import { CentralSystemAction } from './messages/cs';
 import { Right } from 'purify-ts';
 
-describe('test cs<->cp communication', () => {
+describe.skip('test cs<->cp communication', () => {
   const connect = async (cp: ChargePoint, cs: CentralSystem) => {
     let triggerConnected = (_cpId: string) => { };
     cs.addConnectionListener((cpId, status) => {

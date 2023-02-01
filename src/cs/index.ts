@@ -79,7 +79,7 @@ type RequiredPick<T, K extends keyof T> = Omit<T, K> & Required<Pick<T, K>>
  * Represents the central system, can communicate with charge points
  *
  * @example
- * import { CentralSystem } from '@voltbras/ts-ocpp';
+ * import { CentralSystem } from '@qc-hlp/ts-ocpp';
  *
  * // port and request handler as arguments
  * const centralSystem = new CentralSystem(3000, (req, { chargePointId }) => {

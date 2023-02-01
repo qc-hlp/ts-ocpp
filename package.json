@@ -1,12 +1,10 @@
 {
-  "name": "@voltbras/ts-ocpp",
+  "name": "@qc-hlp/ts-ocpp",
   "description": "OCPP (Open Charge Point Protocol) implemented in Typescript",
-  "version": "2.9.0",
+  "version": "0.0.1",
   "main": "dist/index.js",
   "types": "dist/index.d.ts",
-  "homepage": "https://github.com/voltbras/ts-ocpp",
-  "repository": "git://github.com/voltbras/ts-ocpp.git",
-  "author": "eduhenke <eduardo_henke@hotmail.com>",
+  "homepage": "",
   "license": "MIT",
   "scripts": {
     "test": "jest",
@@ -43,8 +41,5 @@
   },
   "files": [
     "dist/**/*"
-  ],
-  "publishConfig": {
-    "registry": "https://npm.pkg.github.com/"
-  }
+  ]
 }
