@@ -1,7 +1,7 @@
 {
   "name": "@qc-hlp/ts-ocpp",
-  "description": "OCPP (Open Charge Point Protocol) implemented in Typescript",
-  "version": "0.0.1",
+  "description": "Customization of @voltbras/ts-ocpp",
+  "version": "0.0.4",
   "main": "dist/index.js",
   "types": "dist/index.d.ts",
   "homepage": "",
@@ -15,7 +15,8 @@
     "prepare": "yarn build",
     "prepublishOnly": "npm test && yarn docs-ts",
     "postversion": "git push && git push --tags",
-    "lint": "eslint . --ext .js,.ts"
+    "lint": "eslint . --ext .js,.ts",
+    "npm-publish": "npm publish --registry=https://registry.npmjs.org/ --access public"
   },
   "dependencies": {
     "debug": "^4.3.4",
