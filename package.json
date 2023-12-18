@@ -1,14 +1,14 @@
 {
   "name": "@qc-hlp/ts-ocpp",
   "description": "Customization of @voltbras/ts-ocpp",
-  "version": "0.0.4",
+  "version": "0.0.6",
   "main": "dist/index.js",
   "types": "dist/index.d.ts",
   "homepage": "",
   "license": "MIT",
   "scripts": {
     "test": "jest",
-    "build": "tsc && yarn copy-assets && yarn docs-ts",
+    "build": "rimraf dist && tsc && yarn copy-assets && yarn docs-ts",
     "copy-assets": "yarn copy-assets-wsdl && yarn copy-assets-jsonschema",
     "copy-assets-wsdl": "cp ./src/messages/soap/*.wsdl ./dist/messages/soap",
     "copy-assets-jsonschema": "cp -R ./src/messages/json ./dist/messages/json",

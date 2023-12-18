@@ -9,7 +9,7 @@
         },
         "chargePointModel": {
             "type": "string",
-            "maxLength": 20
+            "maxLength": 50
         },
         "chargePointSerialNumber": {
             "type": "string",
