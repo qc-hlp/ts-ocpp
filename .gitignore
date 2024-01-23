@@ -4,3 +4,4 @@ dist
 .npmrc
 /*.log
 .yarn
+.DS_Store

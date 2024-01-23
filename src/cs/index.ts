@@ -71,6 +71,9 @@ export type CentralSystemOptions = {
 
   /** can be used to authorize websockets before the socket formation */
   websocketAuthorizer?: (metadata: RequestMetadata) => Promise<boolean> | boolean,
+
+  /** extrat charge point id from the http request url */
+  cpIdExtractor?: (requestUrl: string) => Promise<string> | string | undefined | null,
 }
 
 type RequiredPick<T, K extends keyof T> = Omit<T, K> & Required<Pick<T, K>>
@@ -111,7 +114,7 @@ export default class CentralSystem {
   private websocketsServer: WebSocket.Server;
   private soapServer: soap.Server;
   private httpServer: Server;
-  private options: RequiredPick<CentralSystemOptions, 'websocketPingInterval' | 'rejectInvalidRequests' | 'websocketAuthorizer'>;
+  private options: RequiredPick<CentralSystemOptions, 'websocketPingInterval' | 'rejectInvalidRequests' | 'websocketAuthorizer' | 'cpIdExtractor'>;
 
   constructor(
     port: number,
@@ -125,6 +128,7 @@ export default class CentralSystem {
       rejectInvalidRequests: options.rejectInvalidRequests ?? true,
       websocketPingInterval: 30_000,
       websocketAuthorizer: options.websocketAuthorizer ?? (() => true),
+      cpIdExtractor: options.cpIdExtractor ?? ((requestUrl: string) => { return requestUrl?.split('/').pop() })
     };
     debug('creating central system on port %d - options: %o', port, this.options);
 
@@ -248,7 +252,13 @@ export default class CentralSystem {
         socket.destroy();
         return;
       }
-      const chargePointId = httpRequest.url?.split('/').pop();
+      let chargePointId = null;
+      try {
+        chargePointId = await this.options.cpIdExtractor(httpRequest.url);
+      } catch (error: any) {
+        debug(error?.message);
+        chargePointId = null;
+      }
       if (!chargePointId) {
         debug('websocket upgrade: no charge point id(original url: %s), rejecting connection', httpRequest.url);
         socket.destroy();
@@ -299,7 +309,6 @@ export default class CentralSystem {
     const { chargePointId } = metadata;
     const cpDebug = debug.extend(chargePointId);
     cpDebug('websocket connection: handling connection');
-    this.listeners.forEach((f) => f(chargePointId, 'connected'));
 
     let isAlive = true;
     socket.on('pong', () => {
@@ -341,6 +350,8 @@ export default class CentralSystem {
       cpDebug('websocket connection: adding to existing connection list entry(previous list length: %d)', this.connections[chargePointId].length);
     }
     this.connections[chargePointId].push(connection);
+
+    this.listeners.forEach((f) => f(chargePointId, 'connected'));
 
     socket.on('error', (error) => {
       cpDebug('websocket connection: socket error: %s', error.message);

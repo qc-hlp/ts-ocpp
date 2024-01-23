@@ -1,7 +1,7 @@
 {
   "name": "@qc-hlp/ts-ocpp",
   "description": "Customization of @voltbras/ts-ocpp",
-  "version": "0.0.7",
+  "version": "0.0.9",
   "main": "dist/index.js",
   "types": "dist/index.d.ts",
   "homepage": "",

@@ -138,6 +138,9 @@ export type CentralSystemOptions = {
 
   /** can be used to authorize websockets before the socket formation */
   websocketAuthorizer?: (metadata: RequestMetadata) => Promise<boolean> | boolean
+
+  /** extrat charge point id from the http request url */
+  cpIdExtractor?: (requestUrl: string) => Promise<string> | string | undefined | null
 }
 ```
 
