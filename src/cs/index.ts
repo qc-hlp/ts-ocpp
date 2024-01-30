@@ -34,7 +34,13 @@ export type RequestMetadata = {
 };
 
 export type WebsocketRequestResponseListener =
-  (initiator: 'chargepoint' | 'central-system', type: 'request' | 'response', data: OCPPJMessage, metadata: Omit<RequestMetadata, 'validationError'>) => void;
+  (
+    initiator: 'chargepoint' | 'central-system', 
+    type: 'request' | 'response', 
+    data: OCPPJMessage, 
+    metadata: Omit<RequestMetadata, 'validationError'>,
+    action: ActionName<'v1.6-json'> // only for JSON format but not SOAP
+  ) => void;
 
 export type CSSendRequestArgs<T extends CentralSystemAction<V>, V extends OCPPVersion> = {
   ocppVersion: 'v1.6-json',
@@ -335,10 +341,18 @@ export default class CentralSystem {
       centralSystemActions,
       this.options.rejectInvalidRequests,
       {
-        onReceiveRequest: message => this.options.onWebsocketRequestResponse?.('chargepoint', 'request', message, metadata),
-        onSendResponse: message => this.options.onWebsocketRequestResponse?.('chargepoint', 'response', message, metadata),
-        onReceiveResponse: message => this.options.onWebsocketRequestResponse?.('central-system', 'response', message, metadata),
-        onSendRequest: message => this.options.onWebsocketRequestResponse?.('central-system', 'request', message, metadata),
+        onReceiveRequest: 
+          (message: OCPPJMessage, action: ActionName<'v1.6-json'>) =>
+            this.options.onWebsocketRequestResponse?.('chargepoint', 'request', message, metadata, action),
+        onSendResponse: 
+          (message: OCPPJMessage, action: ActionName<'v1.6-json'>) =>
+            this.options.onWebsocketRequestResponse?.('chargepoint', 'response', message, metadata, action),
+        onReceiveResponse:
+          (message: OCPPJMessage, action: ActionName<'v1.6-json'>) =>
+            this.options.onWebsocketRequestResponse?.('central-system', 'response', message, metadata, action),
+        onSendRequest:
+          (message: OCPPJMessage, action: ActionName<'v1.6-json'>) =>
+            this.options.onWebsocketRequestResponse?.('central-system', 'request', message, metadata, action),
       },
       this.options.websocketRequestTimeout,
     );

@@ -165,6 +165,7 @@ export type WebsocketRequestResponseListener = (
   initiator: 'chargepoint' | 'central-system',
   type: 'request' | 'response',
   data: OCPPJMessage,
-  metadata: Omit<RequestMetadata, 'validationError'>
+  metadata: Omit<RequestMetadata, 'validationError'>,
+  action: ActionName<'v1.6-json'> // only for JSON format but not SOAP
 ) => void
 ```

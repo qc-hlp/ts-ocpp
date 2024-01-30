@@ -1,7 +1,7 @@
 {
   "name": "@qc-hlp/ts-ocpp",
   "description": "Customization of @voltbras/ts-ocpp",
-  "version": "0.0.9",
+  "version": "0.0.12",
   "main": "dist/index.js",
   "types": "dist/index.d.ts",
   "homepage": "",
@@ -12,16 +12,17 @@
     "copy-assets": "yarn copy-assets-wsdl && yarn copy-assets-jsonschema",
     "copy-assets-wsdl": "cp ./src/messages/soap/*.wsdl ./dist/messages/soap",
     "copy-assets-jsonschema": "cp -R ./src/messages/json ./dist/messages/json",
-    "prepare": "yarn build",
     "prepublishOnly": "npm test && yarn docs-ts",
+    "prepare": "yarn build",
+    "npm-publish": "npm publish --registry=https://registry.npmjs.org/ --access public",
     "postversion": "git push && git push --tags",
-    "lint": "eslint . --ext .js,.ts",
-    "npm-publish": "npm publish --registry=https://registry.npmjs.org/ --access public"
+    "lint": "eslint . --ext .js,.ts"
   },
   "dependencies": {
     "debug": "^4.3.4",
     "jsonschema": "^1.4.0",
     "purify-ts": "^0.16.1",
+    "rimraf": "^5.0.5",
     "soap": "^0.37.0",
     "uuid": "^8.3.2",
     "ws": "^7.4.4"

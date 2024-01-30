@@ -19,10 +19,10 @@ export default class Connection<ReqAction extends ActionName<'v1.6-json'>> {
     private readonly respondedActions: ActionName<'v1.6-json'>[],
     private readonly rejectInvalidRequests: boolean = true,
     private readonly handlers?: {
-      onReceiveRequest: (m: OCPPJMessage) => void,
-      onSendResponse: (m: OCPPJMessage) => void,
-      onSendRequest: (m: OCPPJMessage) => void,
-      onReceiveResponse: (m: OCPPJMessage) => void,
+      onReceiveRequest: (m: OCPPJMessage, action: ActionName<'v1.6-json'>) => void,
+      onSendResponse: (m: OCPPJMessage, action: ActionName<'v1.6-json'>) => void,
+      onSendRequest: (m: OCPPJMessage, action: ActionName<'v1.6-json'>) => void,
+      onReceiveResponse: (m: OCPPJMessage, action: ActionName<'v1.6-json'>) => void,
     },
     private readonly requestTimeout?: number,
   ) { }
@@ -51,14 +51,14 @@ export default class Connection<ReqAction extends ActionName<'v1.6-json'>> {
         payload,
       } as const;
       debug(`sending request %o`, requestMessage);
-      this.handlers?.onSendRequest(requestMessage);
+      this.handlers?.onSendRequest(requestMessage, action);
       await this.sendOCPPMessage(requestMessage);
       const responseMessage = await waitResponse;
       debug(`received response %o`, responseMessage);
       // cleanup function to avoid memory leak
       delete this.messageTriggers[id];
 
-      this.handlers?.onReceiveResponse(responseMessage);
+      this.handlers?.onReceiveResponse(responseMessage, action);
       if (responseMessage.type === MessageType.CALL) return Left(
         new OCPPRequestError('response received was of CALL type, should be either CALLRESULT or CALLERROR')
       );
@@ -74,7 +74,10 @@ export default class Connection<ReqAction extends ActionName<'v1.6-json'>> {
     parseOCPPMessage(data)
       .map(msg => this.handleOCPPMessage(msg))
       .map(async result => {
-        await result.map(response => this.sendOCPPMessage(response))
+        await result.map(
+          response => this.sendOCPPMessage(response[0])
+                              .then(_ => this.handlers?.onSendResponse(response[0], response[1]))
+        )
       })
   }
 
@@ -90,12 +93,12 @@ export default class Connection<ReqAction extends ActionName<'v1.6-json'>> {
     })
   }
 
-  private handleOCPPMessage(message: OCPPJMessage): MaybeAsync<OCPPJMessage> {
+  private handleOCPPMessage(message: OCPPJMessage): MaybeAsync<[OCPPJMessage, ActionName<'v1.6-json'>]> {
     return MaybeAsync.fromPromise(async () => {
       debug(`received message %o`, message);
       switch (message.type) {
         case MessageType.CALL:
-          this.handlers?.onReceiveRequest(message);
+          this.handlers?.onReceiveRequest(message, message.action);
           const response =
             await EitherAsync.liftEither(validateMessageRequest(message.action, message.payload ?? {}, this.requestedActions))
               .map<{
@@ -136,8 +139,7 @@ export default class Connection<ReqAction extends ActionName<'v1.6-json'>> {
                   id: message.id,
                   payload,
                 }));
-          this.handlers?.onSendResponse(formattedResponse);
-          return Just(formattedResponse);
+          return Just([formattedResponse, message.action]);
         case MessageType.CALLERROR:
         case MessageType.CALLRESULT:
           this.messageTriggers[message.id](message);
