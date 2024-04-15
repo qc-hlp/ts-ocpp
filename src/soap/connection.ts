@@ -43,7 +43,7 @@ export default class SOAPConnection {
         'To': this.endpoint,
       }, '', 'wsa5', 'http://www.w3.org/2005/08/addressing');
 
-      const [err, result, _rawResponse, _soapHeader, _rawRequest] = await new Promise(resolve => {
+      const [err, result, _rawResponse, _soapHeader, _rawRequest]: any = await new Promise(resolve => {
         const [serviceKey, portKey] = this.connectedTo === 'cp'
           ? ['ChargePointService', 'ChargePointServiceSoap12']
           : ['CentralSystemService', 'CentralSystemServiceSoap12'];

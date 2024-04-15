@@ -42,7 +42,7 @@ export const parseOCPPMessage = (raw: OCPPJRawMessage): Either<ValidationError, 
       default: return Left(new ValidationError(`Not supported message type: ${type}`));
     }
   } catch (err) {
-    return Left(new ValidationError(`An error occurred when trying to parse message: "${raw}"`).wrap(err))
+    return Left(new ValidationError(`An error occurred when trying to parse message: "${raw}"`).wrap(err as any))
   }
 };
 

@@ -260,7 +260,7 @@ export default class CentralSystem {
       }
       let chargePointId = null;
       try {
-        chargePointId = await this.options.cpIdExtractor(httpRequest.url);
+        chargePointId = await this.options.cpIdExtractor(httpRequest.url as any);
       } catch (error: any) {
         debug(error?.message);
         chargePointId = null;
@@ -283,7 +283,7 @@ export default class CentralSystem {
         return;
       }
 
-      server.handleUpgrade(httpRequest, socket, head, function done(socket) {
+      server.handleUpgrade(httpRequest, socket as any, head, function done(socket) {
         cpDebug('websocket upgrade: connection established');
         server.emit('connection', socket, httpRequest, metadata);
       });
@@ -316,18 +316,22 @@ export default class CentralSystem {
     const cpDebug = debug.extend(chargePointId);
     cpDebug('websocket connection: handling connection');
 
-    let isAlive = true;
+    socket.on('ping', () => {
+      cpDebug('websocket connection: received ping');
+    });
+
+    let pendingPings = 0;
     socket.on('pong', () => {
       cpDebug('websocket connection: received pong');
-      isAlive = true;
+      pendingPings = 0;
     });
     function noop() { }
     const pingInterval = setInterval(() => {
-      if (isAlive === false) {
+      if (pendingPings >= 2) { // terminate socket if 2 pings are not ponged
         cpDebug('websocket connection: connection is dead, closing');
         return socket.terminate();
       }
-      isAlive = false;
+      pendingPings++;
       cpDebug('websocket connection: sending ping');
       socket.ping(noop);
     }, this.options.websocketPingInterval);
@@ -376,8 +380,8 @@ export default class CentralSystem {
       this.options.onRawWebsocketData?.(data, metadata);
       connection.handleWebsocketData(data)
     });
-    socket.on('close', () => {
-      cpDebug('websocket connection: closing conection');
+    socket.on('close', (code, reason) => {
+      cpDebug(`websocket connection: closing conection, code ${code}, reason ${reason}`);
       const closedIndex = this.connections[chargePointId].findIndex(c => c === connection);
       this.connections[chargePointId].splice(closedIndex, 1);
       clearInterval(pingInterval);
