@@ -124,7 +124,7 @@ export type CentralSystemOptions = {
   /**
    * can be used to log exactly what the chargepoint sends to this central system without any processing
    * @example
-   * onRawSocketData: (data) => console.log(data.toString('ascii'))
+   * onRawSocketData: (data) => console.log(data.toString('hex'))
    **/
   onRawSocketData?: (data: Buffer) => void
   onRawSoapData?: (type: 'replied' | 'received', data: string) => void

@@ -63,7 +63,7 @@ export type CentralSystemOptions = {
   /**
    * can be used to log exactly what the chargepoint sends to this central system without any processing
    * @example
-   * onRawSocketData: (data) => console.log(data.toString('ascii'))
+   * onRawSocketData: (data) => console.log(data.toString('hex'))
    **/
   onRawSocketData?: (data: Buffer) => void
   onRawSoapData?: (type: 'replied' | 'received', data: string) => void
@@ -143,7 +143,7 @@ export default class CentralSystem {
     this.httpServer.on('connection', socket => {
       httpDebug('new http connection');
       socket.on('data', data => {
-        httpDebug('http connection received data:\n%s', data.toString('ascii'));
+        httpDebug('http connection received data:\n%s', data.toString('hex'));
         if (options.onRawSocketData)
           options.onRawSocketData?.(data);
       });
