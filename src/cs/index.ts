@@ -24,7 +24,8 @@ const handleProtocols = (protocols: string[]): string =>
 
 type ConnectionListener = (
   cpId: string,
-  status: 'disconnected' | 'connected'
+  status: 'disconnected' | 'connected',
+  connCount: number
 ) => void;
 
 export type RequestMetadata = {
@@ -369,7 +370,7 @@ export default class CentralSystem {
     }
     this.connections[chargePointId].push(connection);
 
-    this.listeners.forEach((f) => f(chargePointId, 'connected'));
+    this.listeners.forEach((f) => f(chargePointId, 'connected', this.connections[chargePointId]?.length));
 
     socket.on('error', (error) => {
       cpDebug('websocket connection: socket error: %s', error.message);
@@ -385,7 +386,7 @@ export default class CentralSystem {
       const closedIndex = this.connections[chargePointId].findIndex(c => c === connection);
       this.connections[chargePointId].splice(closedIndex, 1);
       clearInterval(pingInterval);
-      this.listeners.forEach((f) => f(chargePointId, 'disconnected'));
+      this.listeners.forEach((f) => f(chargePointId, 'disconnected', this.connections[chargePointId]?.length));
     });
   }
 }
